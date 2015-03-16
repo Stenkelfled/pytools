@@ -160,6 +160,33 @@ def readLTSpiceFile(path):
         
     return measures
     
+def readTekFile(path):
+    ELEM_PER_GRAPH = 6
+    tekfile = open(path, 'r')
+    line = tekfile.readline().split(',')
+    graph_count = len(line)/ELEM_PER_GRAPH
+    graphs = list()
+    for i in xrange(graph_count):
+        graphs.append({"time":list(),
+                       "data":list()
+        })
+    tekfile.seek(0,0) #start from beginning!
+    for line in tekfile:
+        line = line.split(',')
+        for i in xrange(graph_count):
+            graph_line = line[i*ELEM_PER_GRAPH:(i+1)*ELEM_PER_GRAPH]
+            if graph_line[0] != '':
+                try:
+                    value = float(graph_line[1])
+                except ValueError:
+                    pass
+                else:
+                    graphs[i][graph_line[0]] = value
+            graphs[i]["time"].append(float(graph_line[3]))
+            graphs[i]["data"].append(float(graph_line[4]))
+    tekfile.close()
+    return graphs
+    
 #==============================================================================
 # for testing
 #==============================================================================
