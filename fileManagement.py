@@ -213,7 +213,11 @@ def readTekFile(path):
             graphs[i]["time"].append(float(graph_line[3]))
             graphs[i]["data"].append(float(graph_line[4]))
     tekfile.close()
-    return graphs
+    time = np.array(graphs[0]["time"])
+    data = []
+    for graph in graphs:
+        data.append(np.array(graph["data"]))
+    return Measurement(data, time, graphs[0]["Record Length"], graphs[0]["Sample Interval"])
     
 #==============================================================================
 # for testing
@@ -222,9 +226,11 @@ if(__name__ == "__main__"):
     import plotNicely as pN
     pN.plt.close('all')
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
-    meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
+    #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
-    foo = pN.plot(meas.getPlotDataAll())
+    meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
+    foo = pN.plot(meas.getPlotData(0))
+    #foo = pN.plot(meas.getPlotDataAll())
     
 
     
