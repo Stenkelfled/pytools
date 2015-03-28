@@ -99,8 +99,8 @@ class Measurement:
 #        return (([self.maxtime],[value]),)
 #            
     def getPlotData(self, key, start=0, end=1):
-        data_start = round(self.Length*start)
-        data_end = round(self.Length*end)
+        data_start = int(round(self.Length*start))
+        data_end = int(round(self.Length*end))
         return ((self.time[data_start:data_end], self.data[key][data_start:data_end]),)
         
     def getPlotDataSelection(self, keys, **kwargs):
@@ -153,31 +153,40 @@ def readMatfiles(path, isfile=False):
     return measures
     
 def readLTSpiceFile(path):
-    data = list()
     ltfile = open(path, 'r')
-    line = ltfile.readline()
-    data_type = line.split('\t')[0]
+    line = ltfile.readline().split('\t')
+    data_type = line[0]
+    time = []
+    data = []
     if(data_type == 'time'):
+        for foo in xrange(1, len(line)):
+            data.append([])
+        print data
         for line in ltfile:
-            data.append([np.float(x) for x in line.split('\t')])
+            line = line.split('\t')
+            time.append(np.float(line[0]))
+            for idx in xrange(1, len(line)):
+                data[idx-1].append(np.float(line[idx]))
     elif(data_type == 'Freq.'):
+        for foo in xrange(1, len(line)):
+            data.append([])
+            data.append([])
         for line in ltfile:
-            line_sp = line.split('\t')
-            freq = np.float(line_sp[0])
-            line_sp = line_sp[1].split(',')
-            ampli = np.float(line_sp[0].strip('dB()\n°'))
-            phase = np.float(line_sp[1].strip('dB()\n°'))
-            data.append([freq, ampli, phase])            
+            line = line.split('\t')
+            time.append(np.float(line[0]))
+            for idx in xrange(1, len(line)):
+                line_sp = line[idx].split(',')
+                ampli = np.float(line_sp[0].strip('dB()\n°'))
+                phase = np.float(line_sp[1].strip('dB()\n°'))
+                data[(idx-1)*2].append(ampli)
+                data[(idx-1)*2+1].append(phase)
     else:
         ltfile.close()
         raise TypeError("lt-spice-type"+data_type+"is not supported. Please add.")
     ltfile.close()
-    data = np.array(data)
-    measures = []
-    for i in xrange(1,data.shape[1]):
-        measures.append(Measurement([data[1:,0], data[1:,i]], "ltspice"))
-        
-    return measures
+    for idx in xrange(0, len(data)):
+        data[idx] = np.array(data[idx])
+    return Measurement(data, time, len(time), nan)
     
 def readTekFile(path):
     ELEM_PER_GRAPH = 6
@@ -212,10 +221,10 @@ def readTekFile(path):
 if(__name__ == "__main__"):
     import plotNicely as pN
     pN.plt.close('all')
-    meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
-    #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
+    #meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
+    meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
-    foo = pN.plot(meas.getPlotData(0))
+    foo = pN.plot(meas.getPlotDataAll())
     
 
     
