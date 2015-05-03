@@ -186,7 +186,7 @@ def readLTSpiceFile(path):
     ltfile.close()
     for idx in xrange(0, len(data)):
         data[idx] = np.array(data[idx])
-    return Measurement(data, time, len(time), nan)
+    return Measurement(data, time, len(time), float('nan'))
     
 def readTekFile(path):
     ELEM_PER_GRAPH = 6
@@ -219,6 +219,36 @@ def readTekFile(path):
         data.append(np.array(graph["data"]))
     return Measurement(data, time, graphs[0]["Record Length"], graphs[0]["Sample Interval"])
     
+def readTractionControlFile(path, curves):
+    tcfile = open(path, 'r')
+    line = tcfile.readline().split('\t')
+    if(line[0] != "curves"):
+        tcfile.close()
+        raise ValueError("Did not find number of curves in file. Aborting.")
+        return None
+    graph_count = int(line[1])
+    time = list()
+    data = list()
+    for i in xrange(len(curves)):
+        data.append(list())
+    for i in xrange(graph_count):
+        line = tcfile.readline()
+    for line in tcfile:
+        line = line.split('\t')
+        for curve in curves:
+            if (line[curve+1] == "X"):
+                break;
+        else:
+            #got valid data for all curves
+            time.append(float(line[0]))
+            for i in xrange(len(curves)):
+                data[i].append(float(line[curves[i]+1]))
+    tcfile.close()
+    time = np.array(time)
+    data = [np.array(curve) for curve in data]
+    
+    return Measurement(data, time, len(time), float('nan'))
+    
 #==============================================================================
 # for testing
 #==============================================================================
@@ -228,7 +258,8 @@ if(__name__ == "__main__"):
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
-    meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
+    #meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
+    meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\PWM-Strom_Motor-fest.csv", [1])
     foo = pN.plot(meas.getPlotData(0))
     #foo = pN.plot(meas.getPlotDataAll())
     
