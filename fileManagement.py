@@ -4,7 +4,7 @@ Created on Thu Jun 12 14:16:41 2014
 
 @author: stenkelfled
 """
-
+import copy
 import glob
 from math import isnan
 import numpy as np
@@ -51,6 +51,12 @@ class Measurement:
         
     def max(self, key):
         return max(self[key])
+        
+#    def append(self, other):
+#        maxtime = self.time[-1]
+#        newtime = copy.deepcopy(other.time)+maxtime
+#        self.time.extend(newtime)
+#        self.data[0].extend(other.data[0])
 
     def calcAbs(self):
         for idx in xrange(0, len(self.data)):
@@ -113,6 +119,10 @@ class Measurement:
         return self.getPlotDataSelection(range(0, len(self.data)), **kwargs)
         
     def filterSignal(self, key, frequencies):
+        """filter the signal with 4th order butterworth filter.
+            @param: key: signal number
+            @param: frequencies: [freq, freq, freq,...] negative frequencies: Lowpass, positive frequencies: highpass
+        """
         if (isnan(self.Tinterval)):
             raise ValueError("There is no time interval. Maybe you have fed a LTSpice-file. In this case filtering is not supported")
         signal = self[key]
@@ -258,8 +268,9 @@ if(__name__ == "__main__"):
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
-    #meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
-    meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\PWM-Strom_Motor-fest.csv", [1])
+    meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
+    #meas.append(meas)
+    #meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\PWM-Strom_Motor-fest.csv", [1])
     foo = pN.plot(meas.getPlotData(0))
     #foo = pN.plot(meas.getPlotDataAll())
     
