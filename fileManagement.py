@@ -52,11 +52,33 @@ class Measurement:
     def max(self, key):
         return max(self[key])
         
-#    def append(self, other):
-#        maxtime = self.time[-1]
-#        newtime = copy.deepcopy(other.time)+maxtime
-#        self.time.extend(newtime)
-#        self.data[0].extend(other.data[0])
+    def ncurves(self):
+        """@return: number of curves"""
+        return len(self.data)
+        
+    def append(self, other, mapping=None):
+        """ append data from another measurement to this
+            @param: other (Measurement): the other measurement
+            @param: mapping(tuple of mapppings): mapping for concatenating the
+                data. ((0,0), (1,2)) will cocatenate self.data[0] with
+                other.data[0] and self.data[1] with other.data[2]
+        """
+        if(not isinstance(meas, Measurement)):
+            raise TypeError("Other has to be from type Measurement")
+        if(mapping == None):
+            mapping = list()
+            if (self.ncurves > other.ncurves):
+                curvenumber = other.ncurves()
+            else:
+                curvenumber = self.ncurves()
+            for i in xrange(curvenumber):
+                mapping.append((i,i))
+        maxtime = self.time[-1] - other.time[0]
+        newtime = copy.deepcopy(other.time)+maxtime
+        self.time  = np.append(self.time, newtime)
+        self.Length += len(newtime)
+        for map_ in mapping:
+            self.data[map_[0]] = np.append(self.data[map_[0]], other.data[map_[1]])
 
     def calcAbs(self):
         for idx in xrange(0, len(self.data)):
@@ -269,9 +291,12 @@ if(__name__ == "__main__"):
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
     meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
-    #meas.append(meas)
+    pltd = []
+    meas.append(meas, ((0,1),(1,0)) )
+    pltd.extend(meas.getPlotData(0))
+    pltd.extend(meas.getPlotData(1))
     #meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\PWM-Strom_Motor-fest.csv", [1])
-    foo = pN.plot(meas.getPlotData(0))
+    foo = pN.plot(pltd)
     #foo = pN.plot(meas.getPlotDataAll())
     
 
