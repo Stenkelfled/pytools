@@ -79,6 +79,16 @@ class Measurement:
         self.Length += len(newtime)
         for map_ in mapping:
             self.data[map_[0]] = np.append(self.data[map_[0]], other.data[map_[1]])
+            
+    def indexOf(self, time):
+        """get the index of the given time
+            @param: time: the time for the wanted index
+        """
+        i = np.where(self.time >= time)
+        return i[0][0]
+    
+    def lastIndex(self):
+        return len(self.time)-1
 
     def calcAbs(self):
         for idx in xrange(0, len(self.data)):
@@ -91,17 +101,17 @@ class Measurement:
     def calcEnvelope(self, key):
         self.envelopes[key] = abs(scipy.signal.hilbert(self[key],axis=0))
         
-#            
-#    def crop(self, start, end):
-#        """ remove begin and/or end of the signal
-#            @param: start: start-index of the signal part, that is meant to be kept
-#            @param: end: end-index of the signal part, that is meant to be kept
-#        """
-#        self.A = self.A[start:end]
-#        self.B = self.B[start:end]
-#        self.time = self.time[start:end]
-#        self.Tstart = self.time[0]
-#        self.Length = len(self.A)
+            
+    def crop(self, start, end):
+        """ remove begin and/or end of the signal
+            @param: start: start-index of the signal part, that is meant to be kept
+            @param: end: end-index of the signal part, that is meant to be kept
+        """
+        for i in xrange(self.ncurves()):
+            self.data[i] = self.data[i][start:end]
+        self.time = self.time[start:end]
+        self.Tstart = self.time[0]
+        self.Length = len(self.time)
 #        
 #    def cropRatio(self, start=0, end=1):
 #        """ remove begin and/or end of the signal
@@ -290,14 +300,12 @@ if(__name__ == "__main__"):
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
-    meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
-    pltd = []
-    meas.append(meas, ((0,1),(1,0)) )
-    pltd.extend(meas.getPlotData(0))
-    pltd.extend(meas.getPlotData(1))
+    #meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
     #meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\PWM-Strom_Motor-fest.csv", [1])
-    foo = pN.plot(pltd)
+    #foo = pN.plot(pltd)
     #foo = pN.plot(meas.getPlotDataAll())
+    
+    
     
 
     
