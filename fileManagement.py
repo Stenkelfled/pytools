@@ -63,7 +63,7 @@ class Measurement:
                 data. ((0,0), (1,2)) will cocatenate self.data[0] with
                 other.data[0] and self.data[1] with other.data[2]
         """
-        if(not isinstance(meas, Measurement)):
+        if(not isinstance(other, Measurement)):
             raise TypeError("Other has to be from type Measurement")
         if(mapping == None):
             mapping = list()
@@ -150,7 +150,7 @@ class Measurement:
     def getPlotDataAll(self, **kwargs):
         return self.getPlotDataSelection(range(0, len(self.data)), **kwargs)
         
-    def filterSignal(self, key, frequencies):
+    def filterSignal(self, key, frequencies, order=4):
         """filter the signal with 4th order butterworth filter.
             @param: key: signal number
             @param: frequencies: [freq, freq, freq,...] negative frequencies: Lowpass, positive frequencies: highpass
@@ -163,7 +163,7 @@ class Measurement:
                 my_btype = "lowpass"
             else:
                 my_btype = "highpass"
-            (b,a) = scipy.signal.butter(4, np.array(2*abs(freq)/(1/self.Tinterval)), btype = my_btype)
+            (b,a) = scipy.signal.butter(order, np.array(2*abs(freq)/(1/self.Tinterval)), btype = my_btype)
             signal = scipy.signal.lfilter(b,a,signal,0)
         return signal
         
