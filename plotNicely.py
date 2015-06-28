@@ -122,7 +122,7 @@ class Pan:
 #==============================================================================
 class plot:
         
-    def __init__(self,data, axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, ylim=None):
+    def __init__(self,data, axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None):
         """
             @param: size: the size of the plot window in !!mm!!
             @param: data: ((x,y), (x,y))
@@ -142,6 +142,7 @@ class plot:
         self.markersize = markersize
         self.additional_limits = additional_limits
         self.xmul=xmul
+        self.xlim=xlim
         self.ymul=ymul
         self.ylim=ylim
         
@@ -192,6 +193,8 @@ class plot:
         plt.axis(self.axis_style)
         if(self.ylim != None):
             self.axes.set_ylim(self.ylim)
+        if(self.xlim != None):
+            self.axes.set_xlim(self.xlim)
         if(self.additional_limits != None):
             xlim = list(self.axes.get_xlim())
             ylim = list(self.axes.get_ylim())

@@ -278,7 +278,7 @@ def readTractionControlFile(path, curves):
     for line in tcfile:
         line = line.split('\t')
         for curve in curves:
-            if (line[curve+1] == "X"):
+            if (line[curve+1].startswith("X")):
                 break;
         else:
             #got valid data for all curves
@@ -301,7 +301,7 @@ if(__name__ == "__main__"):
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
     #meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
-    #meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\PWM-Strom_Motor-fest.csv", [1])
+    meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\Nur_Traktor_ohne_Band\PWM80_Motor-laeuft.csv", [2])
     #foo = pN.plot(pltd)
     #foo = pN.plot(meas.getPlotDataAll())
     
