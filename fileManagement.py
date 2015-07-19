@@ -135,7 +135,10 @@ class Measurement:
 #        
 #    def getPlotDataEnvelopeAMaximum(self, value=0):
 #        return (([self.maxtime],[value]),)
-#            
+        
+    def getPlotDataRange(self, key, plot_range):
+        return self.getPlotData(key, plot_range[0], plot_range[1])
+            
     def getPlotData(self, key, start=0, end=1):
         data_start = int(round(self.Length*start))
         data_end = int(round(self.Length*end))

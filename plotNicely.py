@@ -122,10 +122,12 @@ class Pan:
 #==============================================================================
 class plot:
         
-    def __init__(self,data, axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None):
+    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None):
         """
-            @param: size: the size of the plot window in !!mm!!
             @param: data: ((x,y), (x,y))
+            @param: axes: axes to plot in, or None
+            @param: right_axes=[plot instance]: plot in same figure, but make new axis with ticks on right side
+            @param: size: the size of the plot window in !!mm!!
             @param: multiple_traces: data: list of traces, one trace: ((x,y), (x,y)) !!only in scroll mode!!
         """
         ##copy input data to object
@@ -148,22 +150,40 @@ class plot:
         
         ##generate plot output
         self.current_plot = 0
-        if(axes == None):
-            if(hold == True):
-                self.figure = plt.gcf()
-                self.axes = plt.gca()
+        if(right_axes == None):
+            if(axes == None):
+                if(hold == True):
+                    self.figure = plt.gcf()
+                    self.axes = plt.gca()
+                else:
+                    self.figure = plt.figure()
+                    self.axes = self.figure.add_subplot(1,1,1)
             else:
-                self.figure = plt.figure()
-                self.axes = self.figure.add_subplot(1,1,1)
+                self.figure = plt.gcf()
+                self.axes = axes
         else:
-            self.figure = plt.gcf()
-            self.axes = axes
+            self.figure = right_axes.figure
+            self.axes = right_axes.axes.twinx()
+            #self.axes.yticks
         if(self.scroll):
             self.plotCurrent()
             self.figure.canvas.mpl_connect('key_press_event', self.onKeyDownHandler)
             self.figure.canvas.mpl_connect('key_release_event', self.onKeyUpHandler)
         else:
             self.plotAll()
+
+        #adjust ylabels            
+        if(right_axes != None):
+            pass
+#            left_ticks = right_axes.axes.get_yticks()
+#            print left_ticks
+#            right_ticks = self.axes.get_yticks()
+#            print right_ticks
+#            new_right_ticks = np.linspace(right_ticks[0], right_ticks[-1], len(left_ticks))
+#            print new_right_ticks
+#            self.axes.set_yticks(new_right_ticks)
+            #self.axes.yaxis.set_ticklabels(["%e" % val for val in new_right_ticks])
+#            plt.plot()
         
         ##stuff for zooming
         self.box_zooming = BoxZoom()
@@ -370,12 +390,19 @@ if __name__ == "__main__":
     #measures = fM.readMatfiles(path)
     #a = plot([meas.getPlotDataA()[0] for meas in measures], scroll=True)
     
-    data = [ [([1,2,3],[1,1,1]), ([1,2,3],[0,1,2]), ([1.5],[1.5])],
-             (([1,2,3],[2,2,2]), ([1,2,3],[0,2,3]))  ]
-    vline = {'name':'axvline', 'data':[1.5,], 'kwdata':{'ls':'--', 'lw':3}}
-    data[0].append(vline)
-    a = plot(data, multiple_traces=True, scroll=True, additional_limits=[0,0,0.5,0.5])
-#    a = plot(data, multiple_traces=True, scroll=True)
+#    data = [ [([1,2,3],[1,1,1]), ([1,2,3],[0,1,2]), ([1.5],[1.5])],
+#             (([1,2,3],[2,2,2]), ([1,2,3],[0,2,3]))  ]
+#    vline = {'name':'axvline', 'data':[1.5,], 'kwdata':{'ls':'--', 'lw':3}}
+#    data[0].append(vline)
+#    a = plot(data, multiple_traces=True, scroll=True, additional_limits=[0,0,0.5,0.5])
+    
+    data1 = [ ([1,2,3],[0,1,2])]
+    foo = plot(data1, line_style=[".-"])
+    plt.xlabel("xlabel")
+    plt.ylabel("left label")
+    data2 = [ ([1,1.5,2],[100,200,370])]
+    bar = plot(data2, right_axes=foo, line_style=["r.-"])
+    plt.ylabel("right label")
     
     
     
