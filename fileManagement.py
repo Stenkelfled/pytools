@@ -112,15 +112,15 @@ class Measurement:
         self.time = self.time[start:end]
         self.Tstart = self.time[0]
         self.Length = len(self.time)
-#        
-#    def cropRatio(self, start=0, end=1):
-#        """ remove begin and/or end of the signal
-#            @param: start: start-ratio(0...1) of the signal part, that is meant to be kept
-#            @param: end: end-ratio(1...0) of the signal part, that is meant to be kept
-#            start=0 and end=1 -> do not crop anything
-#        """
-#        self.crop(int(start*self.Length), int(end*self.Length))
-#        
+       
+    def cropRatio(self, start=0, end=1):
+        """ remove begin and/or end of the signal
+            @param: start: start-ratio(0...1) of the signal part, that is meant to be kept
+            @param: end: end-ratio(1...0) of the signal part, that is meant to be kept
+            start=0 and end=1 -> do not crop anything
+        """
+        self.crop(int(start*self.Length), int(end*self.Length))
+        
     def shift(self, time):
         """shift the signal to right/left
             @param: time: time to shift in s. Negative Values: shift to left
