@@ -122,7 +122,7 @@ class Pan:
 #==============================================================================
 class plot:
         
-    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None):
+    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None):
         """
             @param: data: ((x,y), (x,y))
             @param: axes: axes to plot in, or None
@@ -134,6 +134,7 @@ class plot:
         matplotlib.rc('text', usetex = True)
         self.data = data
         self.line_style = line_style
+        self.line_width = line_width
         self.axis_style = axis_style
         self.size = None        
         if(size!=None):
@@ -196,7 +197,7 @@ class plot:
         self.figure.canvas.mpl_connect('scroll_event', self.onMouseScrollHandler)
         
         self.scroll_step = 0
-        self.resetLineStyle()
+        self.resetLineProperties()
         
     def apply_powlim(self):
         self.axes.xaxis.get_major_formatter().set_powerlimits(self.powlim.x)
@@ -235,12 +236,24 @@ class plot:
     def resetLineStyle(self):
         self.line_style_pos = -1
         
+    def getNextLineWidth(self):
+        self.line_width_pos +=1
+        self.line_width_pos = self.line_width_pos%len(self.line_width)
+        return self.line_width[self.line_width_pos]
+        
+    def resetLineWidth(self):
+        self.line_width_pos = -1
+        
+    def resetLineProperties(self):
+        self.resetLineStyle()
+        self.resetLineWidth()
+        
     def plotPlot(self, trace):
         if(isinstance(trace,(list,tuple))):
             if(len(trace[0]) == 1):
-                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle()[0]+'o', markersize=self.markersize) #round marker instead of line
+                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle()[0]+'o', linewidth=self.getNextLineWidth(), markersize=self.markersize) #round marker instead of line
             else:
-                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle(), markersize=self.markersize)
+                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle(), linewidth=self.getNextLineWidth(), markersize=self.markersize)
         elif(isinstance(trace,dict)):
             if(trace['name'] == 'axvline'):
                 if(not('kwdata' in trace)):
@@ -263,7 +276,7 @@ class plot:
             
         
     def plotAll(self):
-        self.resetLineStyle()
+        self.resetLineProperties()
         for data_i in self.data:
             self.plotPlot(data_i)
         self.apply_plot_properties()
@@ -271,7 +284,7 @@ class plot:
     def plotCurrent(self):
         self.axes.clear()
         if(self.multiple_traces):
-            self.resetLineStyle()
+            self.resetLineProperties()
             for trace in self.data[self.current_plot]:
                 self.plotPlot(trace)
         else:
