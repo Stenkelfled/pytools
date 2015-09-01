@@ -122,7 +122,7 @@ class Pan:
 #==============================================================================
 class plot:
         
-    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None):
+    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None, labels=None):
         """
             @param: data: ((x,y), (x,y))
             @param: axes: axes to plot in, or None
@@ -148,6 +148,7 @@ class plot:
         self.xlim=xlim
         self.ymul=ymul
         self.ylim=ylim
+        self.labels=labels
         
         ##generate plot output
         self.current_plot = 0
@@ -244,16 +245,29 @@ class plot:
     def resetLineWidth(self):
         self.line_width_pos = -1
         
+    def getNextLabel(self):
+        self.label_pos += 1
+        if(self.labels == None):
+            self.label_pos = self.label_pos%(len(self.data)+1)
+            return str(self.label_pos)
+        else:
+            self.label_pos = self.label_pos%(len(self.labels))
+            return self.labels[self.label_pos]            
+        
+    def resetLabel(self):
+        self.label_pos = -1
+        
     def resetLineProperties(self):
         self.resetLineStyle()
         self.resetLineWidth()
+        self.resetLabel()
         
     def plotPlot(self, trace):
         if(isinstance(trace,(list,tuple))):
             if(len(trace[0]) == 1):
-                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle()[0]+'o', linewidth=self.getNextLineWidth(), markersize=self.markersize) #round marker instead of line
+                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle()[0]+'o', label=self.getNextLabel(), linewidth=self.getNextLineWidth(), markersize=self.markersize) #round marker instead of line
             else:
-                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle(), linewidth=self.getNextLineWidth(), markersize=self.markersize)
+                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle(), label=self.getNextLabel(), linewidth=self.getNextLineWidth(), markersize=self.markersize)
         elif(isinstance(trace,dict)):
             if(trace['name'] == 'axvline'):
                 if(not('kwdata' in trace)):
@@ -403,19 +417,21 @@ if __name__ == "__main__":
     #measures = fM.readMatfiles(path)
     #a = plot([meas.getPlotDataA()[0] for meas in measures], scroll=True)
     
-#    data = [ [([1,2,3],[1,1,1]), ([1,2,3],[0,1,2]), ([1.5],[1.5])],
-#             (([1,2,3],[2,2,2]), ([1,2,3],[0,2,3]))  ]
-#    vline = {'name':'axvline', 'data':[1.5,], 'kwdata':{'ls':'--', 'lw':3}}
-#    data[0].append(vline)
-#    a = plot(data, multiple_traces=True, scroll=True, additional_limits=[0,0,0.5,0.5])
+    data = [ [([1,2,3],[1,1,1]), ([1,2,3],[0,1,2]), ([1.5],[1.5])],
+             (([1,2,3],[2,2,2]), ([1,2,3],[0,2,3]))  ]
+    vline = {'name':'axvline', 'data':[1.5,], 'kwdata':{'ls':'--', 'lw':3}}
+    data[0].append(vline)
+    labels=['a','b','c']
+    a = plot(data, multiple_traces=True, scroll=True, additional_limits=[0,0,0.5,0.5], labels=labels)
     
-    data1 = [ ([1,2,3],[0,1,2])]
-    foo = plot(data1, line_style=[".-"])
-    plt.xlabel("xlabel")
-    plt.ylabel("left label")
-    data2 = [ ([1,1.5,2],[100,200,370])]
-    bar = plot(data2, right_axes=foo, line_style=["r.-"])
-    plt.ylabel("right label")
+#    data1 = [ ([1,2,3],[0,1,2])]
+#    foo = plot(data1, line_style=[".-"])
+#    plt.xlabel("xlabel")
+#    plt.ylabel("left label")
+#    data2 = [ ([1,1.5,2],[100,200,370])]
+#    bar = plot(data2, right_axes=foo, line_style=["r.-"])
+#    plt.ylabel("right label")
+    plt.legend()
     
     
     
