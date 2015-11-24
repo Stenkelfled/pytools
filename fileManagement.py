@@ -52,6 +52,23 @@ class Measurement:
     def max(self, key):
         return max(self[key])
         
+    def maxtime(self, key, pos=0, time=None):
+        """Determines the time of the first absolute maximum value
+            @param: key: Number of signal
+            @param: pos(optional): Starting position of the search
+            @param: time(optional): Starting time of the search. Overwrites pos, if given.
+            @return: The time of first absolute maximum value
+        """
+        if(time != None):
+            pos = self.indexOf(time)
+            print pos
+        signal_part = self[key][pos:]
+        idx = np.where(signal_part >= max(signal_part))
+        print idx        
+        print idx[0][0] + pos
+        time = self.timeOf(idx[0][0] + pos)
+        return time
+        
     def ncurves(self):
         """@return: number of curves"""
         return len(self.data)
@@ -86,6 +103,13 @@ class Measurement:
         """
         i = np.where(self.time >= time)
         return i[0][0]
+        
+    def timeOf(self, index):
+        """Returns the time corresponding to the given index
+            @param: index: Index you want to get the time for
+            @return: Time corresponting to the given index
+        """
+        return self.time[index]
     
     def lastIndex(self):
         return len(self.time)-1
@@ -306,12 +330,11 @@ def readTractionControlFile(path, curves):
 #==============================================================================
 if(__name__ == "__main__"):
     import plotNicely as pN
-    pN.plt.close('all')
+    #pN.plt.close('all')
     #meas = readLTSpiceFile(r"F:\Studienarbeit\Simulation\US-Sender\sender_rechteck.txt")
-    #meas = readLTSpiceFile(r"F:\Studienarbeit\Messungen\Messfilter\filter_bode.txt")
     #meas = readMatfiles(r'F:\Studienarbeit\Messungen\Schall\Gegenstand\20140630-0001_Inbus_08mm.mat', isfile=True)[0]
-    #meas = readTekFile(r"F:\Diplomarbeit\Graphs\grosses_Netzteil\Motor-fest_Strom_PWM50.csv")
-    meas = readTractionControlFile(r"F:\Diplomarbeit\Graphs\TractionControl\CSV\Nur_Traktor_ohne_Band\PWM80_Motor-laeuft.csv", [2])
+    meas = readTekFile(r"Z:\US-Pulser\Timing\1_2_TP.csv")
+    print meas.maxtime(0,time=0.2e-7)
     #foo = pN.plot(pltd)
     #foo = pN.plot(meas.getPlotDataAll())
     
