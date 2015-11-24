@@ -61,11 +61,8 @@ class Measurement:
         """
         if(time != None):
             pos = self.indexOf(time)
-            print pos
         signal_part = self[key][pos:]
         idx = np.where(signal_part >= max(signal_part))
-        print idx        
-        print idx[0][0] + pos
         time = self.timeOf(idx[0][0] + pos)
         return time
         
