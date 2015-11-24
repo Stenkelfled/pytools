@@ -122,9 +122,9 @@ class Pan:
 #==============================================================================
 class plot:
         
-    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_opacity = [1], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None, labels=None):
+    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_opacity = [1], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None, labels=None, title=None):
         """
-            @param: data: ((x,y), (x,y))
+            @param: data: (((x),(y)), ((x),(y)))
             @param: axes: axes to plot in, or None
             @param: right_axes=[plot instance]: plot in same figure, but make new axis with ticks on right side
             @param: size: the size of the plot window in !!mm!!
@@ -150,6 +150,7 @@ class plot:
         self.ymul=ymul
         self.ylim=ylim
         self.labels=labels
+        self.title=title
         
         ##generate plot output
         self.current_plot = 0
@@ -304,6 +305,7 @@ class plot:
         for data_i in self.data:
             self.plotPlot(data_i)
         self.apply_plot_properties()
+        self.axes.set_title(self.title)
         
     def plotCurrent(self):
         self.axes.clear()
