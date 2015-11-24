@@ -153,6 +153,13 @@ class Measurement:
     def getPlotDataAll(self, **kwargs):
         return self.getPlotDataSelection(range(0, len(self.data)), **kwargs)
         
+    def filterAll(self, frequencies, **kwargs):
+        """Applies a filter to all signals. Calls 'filterSignal'
+            @param: frequencies: [freq, freq, freq,...] negative frequencies: Lowpass, positive frequencies: highpass
+        """
+        for key in xrange(self.ncurves()):
+            self[key] = self.filterSignal(key, frequencies, **kwargs)
+        
     def filterSignal(self, key, frequencies, order=4):
         """filter the signal with 4th order butterworth filter.
             @param: key: signal number
@@ -234,7 +241,7 @@ def readLTSpiceFile(path):
     return Measurement(data, time, len(time), float('nan'))
     
 def readTekFile(path):
-    ELEM_PER_GRAPH = 6
+    ELEM_PER_GRAPH = 6 #
     tekfile = open(path, 'r')
     line = tekfile.readline().split(',')
     graph_count = len(line)/ELEM_PER_GRAPH
