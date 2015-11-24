@@ -122,7 +122,7 @@ class Pan:
 #==============================================================================
 class plot:
         
-    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None, labels=None):
+    def __init__(self,data, axes = None, right_axes = None, hold = False, multiple_traces = False, line_style = ["b-","r-","g-","k-","c-","m-"], line_opacity = [1], line_width = [1], markersize = 12, axis_style = "auto", size=None, xpowlim=(0,1), ypowlim=(0,1), scroll=False, additional_limits=None, xmul=1, ymul=1, xlim=None, ylim=None, labels=None):
         """
             @param: data: ((x,y), (x,y))
             @param: axes: axes to plot in, or None
@@ -134,6 +134,7 @@ class plot:
         matplotlib.rc('text', usetex = True)
         self.data = data
         self.line_style = line_style
+        self.line_opacity = line_opacity
         self.line_width = line_width
         self.axis_style = axis_style
         self.size = None        
@@ -245,6 +246,14 @@ class plot:
     def resetLineWidth(self):
         self.line_width_pos = -1
         
+    def getNextLineOpacity(self):
+        self.line_opacity_pos += 1
+        self.line_opacity_pos = self.line_opacity_pos%len(self.line_opacity)
+        return self.line_opacity[self.line_opacity_pos]
+        
+    def resetLineOpacity(self):
+        self.line_opacity_pos = -1
+        
     def getNextLabel(self):
         self.label_pos += 1
         if(self.labels == None):
@@ -260,14 +269,15 @@ class plot:
     def resetLineProperties(self):
         self.resetLineStyle()
         self.resetLineWidth()
+        self.resetLineOpacity()
         self.resetLabel()
         
     def plotPlot(self, trace):
         if(isinstance(trace,(list,tuple))):
             if(len(trace[0]) == 1):
-                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle()[0]+'o', label=self.getNextLabel(), linewidth=self.getNextLineWidth(), markersize=self.markersize) #round marker instead of line
+                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle()[0]+'o', label=self.getNextLabel(), linewidth=self.getNextLineWidth(), alpha=self.getNextLineOpacity(), markersize=self.markersize) #round marker instead of line
             else:
-                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle(), label=self.getNextLabel(), linewidth=self.getNextLineWidth(), markersize=self.markersize)
+                self.axes.plot(np.asarray(trace[0])*self.xmul, np.asarray(trace[1])*self.ymul, self.getNextLineStyle(), label=self.getNextLabel(), linewidth=self.getNextLineWidth(), alpha=self.getNextLineOpacity(), markersize=self.markersize)
         elif(isinstance(trace,dict)):
             if(trace['name'] == 'axvline'):
                 if(not('kwdata' in trace)):
@@ -417,12 +427,12 @@ if __name__ == "__main__":
     #measures = fM.readMatfiles(path)
     #a = plot([meas.getPlotDataA()[0] for meas in measures], scroll=True)
     
-    data = [ [([1,2,3],[1,1,1]), ([1,2,3],[0,1,2]), ([1.5],[1.5])],
+    data = [ [([1,2,3],[1,1,1]), ([1,2,3],[0,1,2]), ([2.0],[1.0])],
              (([1,2,3],[2,2,2]), ([1,2,3],[0,2,3]))  ]
     vline = {'name':'axvline', 'data':[1.5,], 'kwdata':{'ls':'--', 'lw':3}}
     data[0].append(vline)
     labels=['a','b','c']
-    a = plot(data, multiple_traces=True, scroll=True, additional_limits=[0,0,0.5,0.5], labels=labels)
+    a = plot(data, multiple_traces=True, scroll=True, additional_limits=[0,0,0.5,0.5], line_opacity=[1,1,0.5,1], labels=labels)
     
 #    data1 = [ ([1,2,3],[0,1,2])]
 #    foo = plot(data1, line_style=[".-"])
