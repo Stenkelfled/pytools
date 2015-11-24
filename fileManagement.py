@@ -52,19 +52,26 @@ class Measurement:
     def max(self, key):
         return max(self[key])
         
-    def maxtime(self, key, pos=0, time=None):
+    def maxtime(self, key, pos=0, time=None, output='time'):
         """Determines the time of the first absolute maximum value
             @param: key: Number of signal
             @param: pos(optional): Starting position of the search
             @param: time(optional): Starting time of the search. Overwrites pos, if given.
+            @param: output(optional): Choose the type output: 'time', 'index'
             @return: The time of first absolute maximum value
         """
         if(time != None):
             pos = self.indexOf(time)
         signal_part = self[key][pos:]
-        idx = np.where(signal_part >= max(signal_part))
-        time = self.timeOf(idx[0][0] + pos)
-        return time
+        idx = np.where(signal_part >= max(signal_part))[0][0]
+        idx += pos
+        if output == 'time':
+            ret = self.timeOf(idx)
+        elif output == 'index':
+            ret = idx
+        else:
+            raise ValueError("You haven't specified a valid output-type.")
+        return ret
         
     def ncurves(self):
         """@return: number of curves"""
